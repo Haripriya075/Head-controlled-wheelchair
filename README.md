@@ -253,6 +253,10 @@ void readFromRegisters(int deviceAddress, byte regAddress, int numRegisters) {
   Wire.requestFrom(deviceAddress, numRegisters);
 }
 
+## Image
+<img width="1280" height="645" alt="WhatsApp Image 2026-07-18 at 3 13 38 PM" src="https://github.com/user-attachments/assets/a4bbfba7-5091-4c9e-bdb4-d8c5f0f773c3" />
+
+
 ## Repository Structure
 
 ```
