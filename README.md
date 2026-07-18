@@ -113,6 +113,145 @@ Wheelchair Movement
 | Neutral Position | Stop |
 
 ---
+## Arduino Code
+
+#include <Wire.h>
+
+#define MPU6050_ADDRESS 0x68
+
+
+
+
+// MPU6050 registers
+#define MPU6050_REG_ACCEL_XOUT_H 0x3B
+#define MPU6050_REG_ACCEL_YOUT_H 0x3D
+#define MPU6050_REG_ACCEL_ZOUT_H 0x3F
+#define MPU6050_REG_PWR_MGMT_1 0x6B
+
+int16_t x,y,z;
+
+int RM2 = 7;
+int RM1 = 6;
+
+int  LM2= 5;
+int  LM1= 4;
+
+
+void setup() {
+   Wire.begin();
+  MPU6050_init();
+
+    Serial.begin(9600);
+
+     pinMode(RM1, OUTPUT);
+  pinMode(RM2, OUTPUT);
+  pinMode(LM1,  OUTPUT);
+  pinMode(LM2, OUTPUT);
+  
+
+  
+}
+
+void loop()  {
+  
+
+ readgyro();
+  printData();
+  delay(100);
+
+  if((x>9000&& x<14000)&&(y<5000 && y>1000)) // forward
+ {
+  digitalWrite(RM1, HIGH);
+  digitalWrite(RM2, LOW);
+
+  digitalWrite(LM1, HIGH);
+  digitalWrite(LM2, LOW);
+ }
+else if((x>-6000 && x<-2000)&&(y<5000 && y>1000)) // reverse
+{
+  digitalWrite(RM1, LOW);
+  digitalWrite(RM2, HIGH);
+
+  digitalWrite(LM1, LOW);
+  digitalWrite(LM2, HIGH);
+ }
+ else if((y>10000 && y<13000)&&(x>2000 &&x<8000)) //left
+{
+  digitalWrite(RM1, LOW);
+  digitalWrite(RM2, HIGH);
+
+  digitalWrite(LM1, HIGH);
+  digitalWrite(LM2, LOW);
+  delay(500);
+   digitalWrite(RM1, LOW);
+  digitalWrite(RM2, LOW);
+
+  digitalWrite(LM1, LOW);
+  digitalWrite(LM2, LOW);
+   delay(1000);
+ }
+ else if((y>-15000 && y<-5000)&&(x>2000 &&x<8000)) // right
+{
+  digitalWrite(RM1,HIGH );
+  digitalWrite(RM2,LOW );
+
+  digitalWrite(LM1, LOW);
+  digitalWrite(LM2, HIGH);
+  delay(500);
+   digitalWrite(RM1, LOW);
+  digitalWrite(RM2, LOW);
+
+  digitalWrite(LM1, LOW);
+  digitalWrite(LM2, LOW);
+   delay(1000);
+ }
+  else if((x>4000 &&x<8000)&&(y<6000 && y>1000)) //stop
+{
+  digitalWrite(RM1, LOW);
+  digitalWrite(RM2, LOW);
+
+  digitalWrite(LM1, LOW);
+  digitalWrite(LM2, LOW);
+ }
+  
+ 
+
+}
+  
+ void MPU6050_init() {
+  // Wake up MPU6050
+  writeToRegister(MPU6050_ADDRESS, MPU6050_REG_PWR_MGMT_1, 0x00);
+}
+
+void readgyro() {
+  readFromRegisters(MPU6050_ADDRESS, MPU6050_REG_ACCEL_XOUT_H, 6);
+  
+  // Combine high and low bytes for accelerometer data
+ x = (Wire.read() << 8 | Wire.read());
+ y = (Wire.read() << 8 | Wire.read());
+  z = (Wire.read() << 8 | Wire.read());
+}
+
+void printData() {
+ // Serial.print("Accelerometer: ");
+  Serial.print('X'); Serial.println(x);
+  Serial.print(" | Y = "); Serial.print(y);
+  Serial.print(" | Z = "); Serial.println(z);
+}
+
+void writeToRegister(int deviceAddress, byte regAddress, byte data) {
+  Wire.beginTransmission(deviceAddress);
+  Wire.write(regAddress);
+  Wire.write(data);
+  Wire.endTransmission();
+}
+
+void readFromRegisters(int deviceAddress, byte regAddress, int numRegisters) {
+  Wire.beginTransmission(deviceAddress);
+  Wire.write(regAddress);
+  Wire.endTransmission();
+  Wire.requestFrom(deviceAddress, numRegisters);
+}
 
 ## Repository Structure
 
